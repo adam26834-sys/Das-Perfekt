@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Perfekt Meisterquiz</title>
+<meta name="description" content="Das Perfekt im Deutschen: 50 Fragen in 6 Stufen mit sofortiger Korrektur.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+html{box-sizing:border-box}body{margin:0}
+/* Konzept: dunkle Nachtblau-Bühne mit Honigwaben, Gold als einzige Akzentfarbe, Bodoni fett für die Überschrift, eine Frage pro Seite. */
+:root{
+  --bg:#0A1230; --bg2:#101C47; --panel:#14224F; --panel2:#1B2C63; --line:#2E4283;
+  --ink:#F5F1E6; --mute:#AAB6D8; --gold:#F2B83B; --gold-fill:#F2B83B; --gold-ink:#1D1400;
+  --ok:#43D8A0; --ok-bg:#0F3A35; --bad:#FF8F8F; --bad-bg:#40202F; --focus:#8DBBFF; --shadow:rgba(0,0,0,.35);
+  --display:'Montserrat','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+  --body:'Nunito Sans','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F1F3FA; --bg2:#E5E9F6; --panel:#FFFFFF; --panel2:#EEF1FA; --line:#C5CEE9;
+    --ink:#101B3F; --mute:#47547B; --gold:#85590A; --gold-fill:#F2B83B; --gold-ink:#1D1400;
+    --ok:#0E7650; --ok-bg:#DCF4E8; --bad:#B42318; --bad-bg:#FDE4E2; --focus:#1D5FD1; --shadow:rgba(16,27,63,.16);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F1F3FA; --bg2:#E5E9F6; --panel:#FFFFFF; --panel2:#EEF1FA; --line:#C5CEE9;
+  --ink:#101B3F; --mute:#47547B; --gold:#85590A; --gold-fill:#F2B83B; --gold-ink:#1D1400;
+  --ok:#0E7650; --ok-bg:#DCF4E8; --bad:#B42318; --bad-bg:#FDE4E2; --focus:#1D5FD1; --shadow:rgba(16,27,63,.16);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;min-height:100vh;overflow-x:hidden}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:10px}
+.honey{position:fixed;inset:0;width:100%;height:100%;color:var(--gold);opacity:.05;pointer-events:none;z-index:0}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 64px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:12px 26px;border-radius:999px;border:2px solid var(--line);background:var(--panel);font-weight:700;cursor:pointer;transition:transform .15s,border-color .15s,background .15s}
+.btn:hover{border-color:var(--gold)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--gold-fill);border-color:var(--gold-fill);color:var(--gold-ink);font-size:1.05rem;box-shadow:0 10px 30px -10px var(--shadow)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent}
+.btn.small{min-height:44px;padding:8px 18px;font-size:.92rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* Start */
+.eyebrow{margin:6px 0 0;font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-size:.78rem;color:var(--gold)}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:24px;align-items:center;padding-block:18px 8px}
+.title{margin:8px 0 0;font-family:var(--display);font-weight:900;line-height:1.04;letter-spacing:-.01em;font-size:clamp(2.3rem,7.4vw,4.8rem);text-wrap:balance}
+.title span{display:block}
+.title em{font-style:normal;color:var(--gold)}
+.lead{margin:20px 0 0;max-width:34ch;font-size:1.15rem;color:var(--mute)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.stufen{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.stufen li{padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);font-size:.84rem;font-weight:700;color:var(--mute)}
+.stufen b{color:var(--gold);margin-right:6px}
+.mascot{position:relative;justify-self:center;width:min(100%,340px)}
+.mascot svg{width:100%;height:auto;display:block;animation:float 4.2s ease-in-out infinite}
+.bubble{position:relative;display:block;width:max-content;max-width:100%;margin:0 0 12px;background:var(--panel);border:2px solid var(--line);border-radius:18px 18px 18px 4px;padding:8px 16px;font-weight:800;font-size:.92rem;box-shadow:0 12px 24px -14px var(--shadow)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* Quiz */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.score{font-weight:700;color:var(--mute)}
+.score b{color:var(--gold);font-size:1.25rem;margin-left:4px;font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:999px;background:var(--panel2);overflow:hidden;margin-top:16px}
+.bar i{display:block;height:100%;background:var(--gold-fill);border-radius:999px;transition:width .4s}
+.crumb{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0 18px;font-weight:700;font-size:.92rem}
+.crumb .lvl{color:var(--gold)}
+.crumb .cnt{color:var(--mute);font-variant-numeric:tabular-nums}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:28px;padding:clamp(20px,4vw,36px);box-shadow:0 30px 60px -36px var(--shadow)}
+.kind{margin:0;font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.q{margin:10px 0 24px;font-family:var(--display);font-weight:700;font-size:clamp(1.25rem,3vw,1.8rem);line-height:1.3;text-wrap:balance}
+.gap{display:inline-block;min-width:3.2ch;border-bottom:3px solid var(--gold);margin:0 .15em;transform:translateY(-.1em)}
+.opts{display:grid;gap:12px}
+.opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:58px;text-align:left;padding:12px 16px;border-radius:18px;border:2px solid var(--line);background:var(--panel2);font-weight:700;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.opt:hover{border-color:var(--gold)}
+.opt .k{flex:none;width:30px;height:30px;border-radius:10px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.85rem;color:var(--mute)}
+.opt .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.opt .ic{flex:none;display:none}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.opt.ok .ic{display:block}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.opt.bad .ic{display:block}
+.opt.dim{opacity:.55}
+.opt.done{cursor:default}
+.opt.ok .k,.opt.bad .k{border-color:currentColor;color:inherit}
+.typef{display:flex;gap:12px;flex-wrap:wrap}
+.typef input{flex:1 1 220px;min-width:0;min-height:56px;padding:10px 18px;border-radius:18px;border:2px solid var(--line);background:var(--panel2);font-size:1.15rem;font-weight:700}
+.typef input:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 35%,transparent)}
+.typef input.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.typef input.bad{border-color:var(--bad);color:var(--bad);background:var(--bad-bg)}
+.line{min-height:64px;display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-radius:18px;border:2px dashed var(--line);background:var(--panel2);align-items:center}
+.line.ok{border:2px solid var(--ok);background:var(--ok-bg)}
+.line.bad{border:2px solid var(--bad);background:var(--bad-bg)}
+.line .hint{color:var(--mute);font-weight:600;font-size:.92rem}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;min-height:52px}
+.chip{min-height:46px;padding:8px 16px;border-radius:14px;border:2px solid var(--gold);background:var(--panel);font-weight:800;cursor:pointer;transition:transform .12s}
+.chip:hover{transform:translateY(-2px)}
+.line .chip{background:var(--gold-fill);color:var(--gold-ink);border-color:var(--gold-fill)}
+.orderbar{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.fb{margin-top:22px;border-radius:20px;padding:18px 20px;border:2px solid}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.bad{background:var(--bad-bg);border-color:var(--bad)}
+.fb h3{display:flex;align-items:center;gap:10px;margin:0;font-size:1.2rem;font-weight:800}
+.fb.ok h3{color:var(--ok)}
+.fb.bad h3{color:var(--bad)}
+.fb p{margin:10px 0 0}
+.corr span{display:block;font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.corr b{font-size:1.1rem;overflow-wrap:anywhere}
+.trap{margin-top:14px;padding:14px 16px;border-radius:16px;background:var(--panel);border:2px solid var(--gold)}
+.trap b{display:block;font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.trap p{margin:6px 0 0}
+.nextrow{display:flex;justify-content:flex-end;margin-top:20px}
+
+/* Ergebnis */
+.res{text-align:center}
+.ring{position:relative;width:min(240px,64vw);margin:8px auto 0}
+.ring svg.r{width:100%;height:auto;transform:rotate(-90deg)}
+.ring .tr{stroke:var(--panel2)}
+.ring .pg{stroke:var(--gold-fill);transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.ring .num{position:absolute;inset:0;display:grid;place-content:center;font-family:var(--display);font-weight:800;font-size:clamp(2rem,7vw,3rem);line-height:1}
+.ring .num small{display:block;font-family:var(--body);font-size:.95rem;font-weight:700;color:var(--mute);margin-top:6px}
+.rtitle{margin:22px 0 0;font-family:var(--display);font-weight:800;font-size:clamp(1.9rem,6vw,3.1rem);line-height:1.1}
+.rmsg{margin:12px auto 0;max-width:46ch;color:var(--mute);font-size:1.1rem}
+.cele{width:min(260px,70vw);margin:0 auto}
+.cele svg{width:100%;height:auto;display:block;animation:float 3.6s ease-in-out infinite}
+.badge{display:inline-block;margin-top:10px;padding:6px 18px;border-radius:999px;background:var(--gold-fill);color:var(--gold-ink);font-weight:800;letter-spacing:.06em}
+.lv{display:grid;gap:10px;margin:28px 0 0;text-align:left}
+.lv div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;font-weight:700;font-size:.95rem}
+.lv i{grid-column:1/-1;height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+.lv i u{display:block;height:100%;background:var(--gold-fill);text-decoration:none}
+.errs{margin:30px 0 0;text-align:left}
+.errs h3{font-family:var(--display);font-size:1.3rem;font-weight:800;margin:0 0 12px}
+.err{padding:14px 16px;border-radius:16px;background:var(--panel2);border:1.5px solid var(--line);margin-top:10px}
+.err small{display:block;color:var(--mute);font-weight:700}
+.err p{margin:4px 0 0}
+.err b{color:var(--ok)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px}
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .mascot{order:-1;width:min(70%,260px)}
+  .opts.two{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<svg class="honey" aria-hidden="true" focusable="false"><defs><pattern id="hx" width="56" height="100" patternUnits="userSpaceOnUse" patternTransform="scale(1.6)"><path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34" fill="none" stroke="currentColor" stroke-width="1.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#hx)"/></svg>
+<div id="app" class="wrap"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Fragen ---------- */
+function mc(q,o,a,ex,trap){return {t:'mc',q:q,o:o,a:a,ex:ex,trap:trap||''};}
+function tf(q,v,ex,trap){return {t:'mc',tf:true,q:q,o:['Richtig','Falsch'],a:v?0:1,ex:ex,trap:trap||''};}
+function ty(q,ans,ex,trap,ph){return {t:'type',q:q,ans:ans,ex:ex,trap:trap||'',ph:ph||'Deine Antwort …'};}
+function od(q,tokens,sol,ex,trap){return {t:'order',q:q,tokens:tokens,sol:sol,ex:ex,trap:trap||''};}
+
+var LEVELS=[
+ {n:'Aufwärmen',from:0,to:7},
+ {n:'Partizip II bilden',from:8,to:19},
+ {n:'haben oder sein?',from:20,to:27},
+ {n:'Satzklammer und Satzbau',from:28,to:35},
+ {n:'Stolperfallen',from:36,to:43},
+ {n:'Meisterklasse',from:44,to:49}
+];
+
+var Q=[
+/* Stufe 1 */
+mc('Vervollständige den Satz: „Gestern ___ ich Deutsch gelernt.“',['habe','bin','hat','ist'],0,'lernen ist kein Bewegungsverb, also haben. Zu „ich“ passt „habe“: Gestern habe ich Deutsch gelernt.'),
+ty('Schreibe den ganzen Satz im Perfekt: „Ich spiele heute Fußball.“',['Ich habe heute Fußball gespielt','Heute habe ich Fußball gespielt','Ich habe Fußball heute gespielt'],'Hilfsverb habe auf Position 2, Partizip II gespielt am Ende: Ich habe heute Fußball gespielt.','','Schreibe den ganzen Satz …'),
+od('Bilde einen Satz im Perfekt.',['Meine','Mutter','hat','Tee','gekocht.'],['Meine Mutter hat Tee gekocht.'],'Das Hilfsverb „hat“ steht auf Position 2, das Partizip II „gekocht“ am Satzende.'),
+mc('Vervollständige den Satz: „Ich habe gestern Brot ___.“',['gekauft','gekaufen','gekauf','gekaufet'],0,'Regelmäßige Verben: ge- + Stamm + -t. Also: kaufen – gekauft. Ich habe gestern Brot gekauft.'),
+mc('Welcher Satz ist richtig?',['Ich habe das Auto gekauft.','Ich habe gekauft das Auto.','Ich kaufe das Auto gehabt.','Ich bin das Auto gekauft.'],0,'Das Partizip II steht am Ende: Ich habe das Auto gekauft.'),
+mc('Vervollständige den Satz: „Mein Bruder hat im Sommer eine Reise ___.“',['gemacht','gemachen','gemachet','gemachtet'],0,'ge- + mach + -t = gemacht. Mein Bruder hat im Sommer eine Reise gemacht.'),
+mc('Meine Schwester ___ gestern Tee getrunken.',['hat','ist','habe','bin'],0,'trinken ist kein Bewegungsverb, also haben. Zu „meine Schwester“ (sie) passt „hat“.'),
+mc('Ich ___ nach Kairo gefahren.',['habe','bin','hat','ist'],1,'fahren ist ein Verb der Bewegung, also sein. Zu „ich“ passt „bin“.'),
+/* Stufe 2 */
+mc('Vervollständige den Satz: „Meine Eltern haben früher in Kairo ___.“',['gearbeitet','gearbeit','gearbeiten','arbeitet'],0,'Der Stamm „arbeit“ endet auf -t. Darum brauchen wir -et: ge-arbeit-et.'),
+ty('Ergänze das Partizip II: „Wir haben im Kurs viel ___.“ (lernen)',['gelernt'],'ge- + lern + -t = gelernt. Wir haben im Kurs viel gelernt.','','Partizip II'),
+mc('Vervollständige den Satz: „Mein Bruder hat in Deutschland Medizin ___.“',['studiert','gestudiert','studieret','gestudieren'],0,'Verben auf -ieren bekommen kein ge-. Die Endung ist -t: studiert.','Hier fehlt das ge- ganz. Das gilt für alle Verben auf -ieren: funktionieren – funktioniert, telefonieren – telefoniert.'),
+mc('Vervollständige den Satz: „Wir haben letzte Woche unsere Tante ___.“',['besucht','gebesucht','besuchen','gebesuchet'],0,'be- ist eine untrennbare Vorsilbe (be-, er-, zer-, ver-, ge-, ent-). Dann gibt es kein ge-: besucht.'),
+ty('Ergänze das Partizip II: „Ich habe dich gestern zweimal ___.“ (anrufen)',['angerufen'],'an- ist trennbar: an + ge + rufen = angerufen. „rufen“ ist ein starkes Verb, deshalb endet es auf -en.','','Partizip II'),
+mc('Vervollständige den Satz: „Der Lehrer hat auf meine Frage nicht ___.“',['geantwortet','geantwortt','geantworten','antwortet'],0,'Der Stamm „antwort“ endet auf -t: ge- + antwort + -et.','Auch Stämme auf -d bekommen -et: bilden – gebildet, arbeiten – gearbeitet.'),
+ty('Ergänze das Partizip II: „Wir haben heute im Supermarkt ___.“ (einkaufen)',['eingekauft'],'ein- ist trennbar: ein + ge + kauf + t = eingekauft.','','Partizip II'),
+mc('Vervollständige den Satz: „Entschuldigung, ich habe meine Hausaufgaben ___.“',['vergessen','gevergessen','vergessent','vergesst'],0,'ver- ist untrennbar, also kein ge-. Das Verb ist unregelmäßig und bleibt in der Form gleich: vergessen.','Bei untrennbaren unregelmäßigen Verben sieht das Partizip II oft wie der Infinitiv aus: bekommen – bekommen, vergessen – vergessen. Aber Vorsicht: verstehen – verstanden!'),
+ty('Ergänze das Partizip II: „Gestern habe ich lange mit meiner Lehrerin ___.“ (sprechen)',['gesprochen'],'Starkes Verb: ge- + Stamm (mit Änderung) + -en. Diese Formen musst du lernen.','','Partizip II'),
+mc('Vervollständige den Satz: „Opa hat uns eine schöne Geschichte ___.“',['erzählt','geerzählt','erzählen','gerzählt'],0,'er- ist untrennbar, also kein ge-: erzählt.'),
+ty('Ergänze das Partizip II: „Wir haben zum Frühstück Eier ___.“ (essen)',['gegessen'],'Starkes Verb: ge- + gess + -en = gegessen.','','Partizip II'),
+mc('Welcher Satz ist richtig?',['Er hat sein Auto verkauft.','Er hat sein Auto geverkauft.','Er hat sein Auto verkaufen.','Er hat sein Auto verkaufet.'],0,'verkaufen wird zu verkauft (ver- ist untrennbar, also kein ge-).','Bei einkaufen steht ge- in der Mitte: eingekauft. Bei verkaufen fehlt es ganz: verkauft.'),
+/* Stufe 3 */
+mc('Er ___ gestern drei Stunden gearbeitet.',['hat','ist','habe','bin'],0,'arbeiten ist kein Bewegungsverb, also haben. Zu „er“ passt „hat“.'),
+mc('Wir ___ mit dem Zug nach Alexandria gefahren.',['sind','haben','seid','hat'],0,'Bewegung von A nach B verlangt sein. Zu „wir“ passt „sind“.'),
+mc('Ahmed ___ gestern im Restaurant Fisch gegessen.',['hat','ist','habe','sind'],0,'essen ist keine Bewegung, also haben. Zu „Ahmed“ (er) passt „hat“. Nicht: ist gegessen.'),
+mc('Der Zug ___ pünktlich angekommen.',['ist','hat','sind','haben'],0,'ankommen bedeutet einen Ortswechsel, also sein.','Auch mit trennbarer Vorsilbe bleibt die Regel gleich: ankommen – ist angekommen, aufstehen – ist aufgestanden.'),
+mc('Ich ___ um sieben Uhr aufgestanden.',['bin','habe','hat','ist'],0,'aufstehen ist ein Wechsel der Position (liegen – stehen), also sein.','Viele wählen „habe“, weil man beim Aufstehen aktiv etwas tut. Entscheidend ist aber der Wechsel von einer Position oder einem Zustand zum anderen. Das verlangt sein.'),
+mc('Welcher Satz ist richtig?',['Wir sind letzten Sommer nach Spanien geflogen.','Wir haben letzten Sommer nach Spanien geflogen.','Wir sind letzten Sommer nach Spanien geflogt.','Wir haben letzten Sommer nach Spanien geflogt.'],0,'fliegen (von A nach B) ist ein Bewegungsverb, also sein. Das Verb ist stark: geflogen.'),
+mc('Daniel ___ sechs Stunden lang gelernt.',['hat','ist','hast','bin'],0,'lernen verlangt haben. Zu „Daniel“ (er) passt „hat“.'),
+mc('Er ___ müde eingeschlafen.',['ist','hat','sind','habe'],0,'einschlafen ist eine Zustandsänderung (wach – schlafend), also sein.','Verben der Zustandsänderung (einschlafen, aufwachen, werden) bilden das Perfekt mit „sein“, auch wenn kein Ort genannt wird.'),
+/* Stufe 4 */
+od('Bilde einen Satz im Perfekt.',['Ich','habe','das','Auto','gekauft.'],['Ich habe das Auto gekauft.','Das Auto habe ich gekauft.'],'Hilfsverb auf Position 2, Partizip II am Ende.'),
+od('Bilde einen Satz im Perfekt.',['gestern','habe','ich','meine','Großeltern','besucht.'],['Gestern habe ich meine Großeltern besucht.','Ich habe gestern meine Großeltern besucht.','Ich habe meine Großeltern gestern besucht.'],'Das Hilfsverb bleibt auf Position 2. Steht „gestern“ am Anfang, folgt das Subjekt nach dem Hilfsverb.'),
+od('Bilde einen Satz im Perfekt.',['am','Wochenende','ist','Karim','nach','Alexandria','gefahren.'],['Am Wochenende ist Karim nach Alexandria gefahren.','Karim ist am Wochenende nach Alexandria gefahren.'],'fahren verlangt sein. Das Partizip II steht am Ende.'),
+od('Bilde eine Ja/Nein-Frage im Perfekt.',['hast','du','keine','Pause','gemacht?'],['Hast du keine Pause gemacht?'],'In der Ja/Nein-Frage steht das Hilfsverb auf Position 1. Das Partizip II bleibt am Ende.'),
+mc('Welcher Aussagesatz ist richtig?',['Daniel hat sechs Stunden lang gelernt.','Daniel hat gelernt sechs Stunden lang.','Daniel sechs Stunden lang hat gelernt.','Daniel gelernt hat sechs Stunden lang.'],0,'Position 2: hat. Ende: gelernt. Dazwischen steht der Rest des Satzes.'),
+ty('Schreibe den ganzen Satz im Perfekt: „Meine Freundin kauft ein neues Kleid.“',['Meine Freundin hat ein neues Kleid gekauft'],'Hilfsverb hat auf Position 2, Partizip II gekauft am Satzende: Meine Freundin hat ein neues Kleid gekauft.','','Schreibe den ganzen Satz …'),
+mc('Welcher Satz ist richtig?',['Heute Morgen habe ich schnell gefrühstückt.','Heute Morgen ich habe schnell gefrühstückt.','Heute Morgen gefrühstückt habe ich schnell.','Heute Morgen habe schnell gefrühstückt ich.'],0,'Steht eine Zeitangabe auf Position 1, bleibt das Hilfsverb auf Position 2. Das Subjekt folgt danach.'),
+od('Bilde eine W-Frage im Perfekt.',['warum','hast','du','die','Hausaufgaben','nicht','gemacht?'],['Warum hast du die Hausaufgaben nicht gemacht?'],'In der W-Frage steht das Fragewort auf Position 1 und das Hilfsverb auf Position 2.','„nicht“ steht vor dem Partizip II, also direkt vor der rechten Seite der Satzklammer: … nicht gemacht.'),
+/* Stufe 5 */
+mc('Welcher Satz ist FALSCH?',['Ich habe das Spiel ausprobiert.','Sie hat ihr Zimmer aufgeräumt.','Er hat das Fenster aufgemacht.','Wir haben das Rezept geausprobiert.'],3,'ausprobieren endet auf -ieren, also gibt es kein ge-. Richtig ist: Wir haben das Rezept ausprobiert.','Obwohl aus- trennbar ist, gilt: Verben auf -ieren bekommen nie ein ge-.'),
+ty('Ergänze das Partizip II: „Ich habe mich gestern für den Kurs ___.“ (anmelden)',['angemeldet'],'an- ist trennbar, der Stamm „meld“ endet auf -d: an + ge + meld + et.','Zwei Regeln gleichzeitig: trennbare Vorsilbe (ge in der Mitte) und Stamm auf -d (Endung -et).','Partizip II'),
+mc('Vervollständige den Satz: „Wir haben uns für morgen um zehn Uhr ___.“',['verabredet','geverabredet','verabreden','verabredt'],0,'ver- ist untrennbar, also kein ge-. Der Stamm „abred“ endet auf -d, also -et.','Untrennbare Vorsilbe plus Stamm auf -t oder -d: kein ge-, aber trotzdem -et (erwarten – erwartet).'),
+mc('Welcher Satz ist richtig?',['Ich habe mein Handy vergessen.','Ich habe mein Handy vergessent.','Ich habe mein Handy gevergessen.','Ich habe mein Handy vergesst.'],0,'vergessen: ver- ist untrennbar und das Verb ist unregelmäßig, also bleibt die Form vergessen.'),
+mc('Vervollständige den Satz: „Meine Freundin hat mich zu ihrer Party ___.“',['eingeladen','eingeladt','geeinladen','eingelädt'],0,'einladen ist ein starkes Verb mit trennbarer Vorsilbe: ein + ge + lad + en.'),
+mc('Welcher Satz ist richtig?',['Wir sind zu spät angekommen.','Wir haben zu spät angekommen.','Wir sind zu spät angekommt.','Wir haben zu spät angekommt.'],0,'ankommen verlangt sein, und das Verb ist stark: angekommen.','Zwei Fallen in einem Satz: das Hilfsverb (sein) und die Form des Partizips (-en, nicht -t).'),
+mc('Vervollständige den Satz: „Gestern ist auf der Straße ein Unfall ___.“',['passiert','gepassiert','passieret','passieren'],0,'passieren endet auf -ieren, also kein ge-. Das Perfekt wird mit sein gebildet: Es ist etwas passiert.','Zwei Besonderheiten: -ieren ohne ge- und das Hilfsverb sein.'),
+mc('Welcher Satz ist richtig?',['Das Handy hat nicht funktioniert.','Das Handy hat nicht gefunktioniert.','Das Handy hat nicht funktionieret.','Das Handy ist nicht funktioniert.'],0,'Verben auf -ieren haben nie ge-. funktionieren bildet das Perfekt mit haben: Das Handy hat nicht funktioniert.','Bei -ieren fehlt das ge- immer, egal ob das Verb trennbar ist oder nicht.'),
+/* Stufe 6 */
+ty('Ergänze Hilfsverb und Partizip II: „Gestern ___ ich meine Freundin ___.“ (anrufen)',['habe angerufen'],'anrufen verlangt haben. Das Partizip II ist angerufen. Gestern habe ich meine Freundin angerufen.','','Hilfsverb + Partizip II'),
+ty('Ergänze Hilfsverb und Partizip II: „Letzte Woche ___ wir nach Kairo ___.“ (fahren)',['sind gefahren'],'Bewegung verlangt sein, „wir“ verlangt sind, und fahren wird zu gefahren.','','Hilfsverb + Partizip II'),
+mc('Welcher Satz enthält einen Fehler?',['Wir haben gestern lange gewartet.','Sie ist nach Hause gegangen.','Ich habe das Seminar besuchen.','Er hat ein Buch bestellt.'],2,'Richtig wäre: Ich habe das Seminar besucht.','Das Partizip II von „besuchen“ hat kein ge- und endet auf -t.'),
+mc('Welcher Satz ist komplett richtig?',['Er hat gestern seine Wohnung aufgeräumt.','Er ist gestern seine Wohnung aufgeräumt.','Er hat gestern seine Wohnung geaufgeräumt.','Er hat gestern seine Wohnung aufräumt.'],0,'aufräumen verlangt haben (Akkusativobjekt, keine Bewegung). Das Verb ist trennbar und regelmäßig: auf + ge + räum + t.'),
+od('Bilde einen langen Satz im Perfekt.',['am','Samstag','hat','Ahmed','zwei','Stunden','in','der','Bibliothek','gearbeitet.'],['Am Samstag hat Ahmed zwei Stunden in der Bibliothek gearbeitet.','Ahmed hat am Samstag zwei Stunden in der Bibliothek gearbeitet.','Ahmed hat am Samstag in der Bibliothek zwei Stunden gearbeitet.'],'Hilfsverb auf Position 2, gearbeitet am Ende (Stamm auf -t, also -et).','Eine Zeitangabe kann auf Position 1 stehen. Dann folgt das Hilfsverb und erst danach das Subjekt.'),
+mc('Er ___ in der Mensa Pizza ___, und danach ___ er schnell nach Hause ___.',['hat gegessen – ist gegangen','ist gegessen – hat gegangen','hat gegessen – hat gegangen','hat geessen – ist gegangen'],0,'essen verlangt haben: hat gegessen. gehen ist Bewegung, also sein: ist gegangen.','In einem Satz können zwei verschiedene Hilfsverben vorkommen. Prüfe jedes Verb einzeln!')
+];
+
+/* ---------- Hilfsfunktionen ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function prompt(s){return esc(s).replace(/___/g,'<span class="gap"></span>');}
+function rng(seed){var s=seed>>>0;return function(){s=(s+0x6D2B79F5)>>>0;var t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function shuffle(a,seed){var r=a.slice(),f=rng(seed);for(var i=r.length-1;i>0;i--){var j=Math.floor(f()*(i+1));var x=r[i];r[i]=r[j];r[j]=x;}return r;}
+function norm(s){return String(s).toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!?,;]+$/,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');}
+function levelOf(i){for(var k=0;k<LEVELS.length;k++){if(i>=LEVELS[k].from&&i<=LEVELS[k].to)return k;}return 0;}
+var reduced=false;try{reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+var fine=false;try{fine=window.matchMedia('(pointer: fine)').matches;}catch(e){}
+
+var ICON_OK='<svg class="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ICON_BAD='<svg class="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+
+/* ---------- Biene Bini (eigene Figur) ---------- */
+function bee(uid){
+ return '<svg viewBox="0 0 270 240" role="img" aria-label="Bini, die fleißige Biene, hält einen goldenen Pokal">'+
+ '<defs><clipPath id="bb'+uid+'"><ellipse cx="110" cy="132" rx="66" ry="58"/></clipPath></defs>'+
+ '<ellipse cx="124" cy="228" rx="78" ry="8" fill="#000" opacity=".2"/>'+
+ '<path d="M92 84C84 58 70 46 56 42" fill="none" stroke="#C98A10" stroke-width="5" stroke-linecap="round"/><circle cx="54" cy="41" r="7.5" fill="#F6B91E"/>'+
+ '<path d="M128 84C136 58 150 46 164 42" fill="none" stroke="#C98A10" stroke-width="5" stroke-linecap="round"/><circle cx="166" cy="41" r="7.5" fill="#F6B91E"/>'+
+ '<ellipse cx="74" cy="86" rx="38" ry="22" transform="rotate(-32 74 86)" fill="#DCEBFF" stroke="#8DB2EA" stroke-width="3" opacity=".96"/>'+
+ '<ellipse cx="146" cy="86" rx="38" ry="22" transform="rotate(32 146 86)" fill="#DCEBFF" stroke="#8DB2EA" stroke-width="3" opacity=".96"/>'+
+ '<ellipse cx="110" cy="132" rx="66" ry="58" fill="#F6B91E"/>'+
+ '<g clip-path="url(#bb'+uid+')"><rect x="30" y="158" width="160" height="13" fill="#2B1B00"/><rect x="30" y="183" width="160" height="13" fill="#2B1B00"/><ellipse cx="88" cy="96" rx="30" ry="12" fill="#FFD66B" opacity=".55" transform="rotate(-18 88 96)"/></g>'+
+ '<path d="M102 190L110 207L118 190Z" fill="#2B1B00"/>'+
+ '<circle cx="88" cy="118" r="13" fill="#fff"/><circle cx="132" cy="118" r="13" fill="#fff"/>'+
+ '<circle cx="90" cy="120" r="7" fill="#2B1B00"/><circle cx="134" cy="120" r="7" fill="#2B1B00"/>'+
+ '<circle cx="92.5" cy="117" r="2.4" fill="#fff"/><circle cx="136.5" cy="117" r="2.4" fill="#fff"/>'+
+ '<circle cx="70" cy="140" r="7.5" fill="#FF9A8B" opacity=".75"/><circle cx="150" cy="140" r="7.5" fill="#FF9A8B" opacity=".75"/>'+
+ '<path d="M96 139Q110 156 124 139" fill="none" stroke="#2B1B00" stroke-width="4.5" stroke-linecap="round"/>'+
+ '<path d="M170 148Q192 170 208 174" fill="none" stroke="#2B1B00" stroke-width="5.5" stroke-linecap="round"/>'+
+ '<path d="M192 100h46v18q0 28-23 32q-23-4-23-32z" fill="#FFD35C" stroke="#C8921A" stroke-width="3.5" stroke-linejoin="round"/>'+
+ '<path d="M192 108h-11q-4 24 15 29M238 108h11q4 24-15 29" fill="none" stroke="#C8921A" stroke-width="4.5" stroke-linecap="round"/>'+
+ '<rect x="209" y="148" width="12" height="18" fill="#FFD35C" stroke="#C8921A" stroke-width="3"/>'+
+ '<rect x="194" y="166" width="42" height="11" rx="3" fill="#2B1B00"/>'+
+ '<path d="M215 112l3.4 7.4 8 .9-6 5.4 1.7 7.9-7.1-4-7.1 4 1.7-7.9-6-5.4 8-.9z" fill="#C8921A"/>'+
+ '<path d="M200 108q-2 14 4 24" fill="none" stroke="#FFF1B8" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>'+
+ '<path d="M244 62l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFE08A"/><path d="M28 120l2.4 6 6 2.4-6 2.4-2.4 6-2.4-6-6-2.4 6-2.4z" fill="#FFE08A"/>'+
+ '</svg>';
+}
+
+/* ---------- Zustand ---------- */
+var KEY='perfekt-meisterquiz-v3',mem=null;
+var S=null,view='start',OS=null,justAnswered=false,confirmNew=false,fxToken=0;
+function valid(s){return s&&Array.isArray(s.queue)&&s.queue.length>0&&typeof s.pos==='number'&&s.pos>=0&&s.pos<s.queue.length&&s.res&&typeof s.res==='object'&&s.queue.every(function(i){return typeof i==='number'&&Q[i];});}
+function load(){var s=null;try{var raw=localStorage.getItem(KEY);if(raw)s=JSON.parse(raw);}catch(e){}if(!valid(s))s=valid(mem)?mem:null;return s;}
+function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function newRun(mode,queue){return {mode:mode,queue:queue,pos:0,res:{},done:false};}
+function allIdx(){var a=[];for(var i=0;i<Q.length;i++)a.push(i);return a;}
+function answeredCount(){return S?Object.keys(S.res).length:0;}
+function scoreOf(){if(!S)return 0;var n=0;S.queue.forEach(function(i){if(S.res[i]&&S.res[i].ok)n++;});return n;}
+function correctText(q){return q.t==='mc'?q.o[q.a]:q.t==='type'?q.ans[0]:q.sol[0];}
+S=load();
+
+/* ---------- Ansichten ---------- */
+var app=document.getElementById('app');
+
+function startHTML(){
+ var ans=answeredCount(),resume=S&&!S.done&&ans>0,done=S&&S.done;
+ var cta='';
+ if(resume){
+  cta+='<button class="btn primary" data-act="resume">Weitermachen · Frage '+(S.pos+1)+' von '+S.queue.length+'</button>';
+  cta+='<button class="btn ghost" data-act="newrun">'+(confirmNew?'Wirklich neu beginnen? Der Fortschritt geht verloren.':'Neu beginnen')+'</button>';
+ }else if(done){
+  cta+='<button class="btn primary" data-act="result">Ergebnis ansehen</button>';
+  cta+='<button class="btn ghost" data-act="newrun">'+(confirmNew?'Wirklich neu beginnen?':'Neu beginnen')+'</button>';
+ }else{
+  cta+='<button class="btn primary" data-act="newrun">Quiz starten</button>';
+ }
+ var chips=LEVELS.map(function(l,i){return '<li><b>'+(i+1)+'</b>'+esc(l.n)+'</li>';}).join('');
+ return '<section class="start">'+
+  '<p class="eyebrow">Das Perfekt · Meisterquiz</p>'+
+  '<div class="hero"><div>'+
+   '<h1 class="title"><span>Ohne Fleiß</span><span>kein <em>Preis</em></span></h1>'+
+   '<p class="lead">50 Fragen in 6 Stufen. Jede Antwort wird sofort korrigiert.</p>'+
+   '<div class="cta">'+cta+'</div>'+
+   '<ul class="stufen" aria-label="Die sechs Stufen">'+chips+'</ul>'+
+  '</div><div class="mascot"><div class="bubble">Fleißig sein lohnt sich!</div>'+bee('s')+'</div></div>'+
+ '</section>';
+}
+
+function quizHTML(){
+ var qi=S.queue[S.pos],q=Q[qi],r=S.res[qi],lv=LEVELS[levelOf(qi)],total=S.queue.length;
+ var pct=Math.round(((S.pos+(r?1:0))/total)*100);
+ var kinds={mc:'Wähle die richtige Antwort',type:'Schreibe die Antwort',order:'Bringe die Wörter in die richtige Reihenfolge'};
+ var kind=q.tf?'Richtig oder falsch?':kinds[q.t];
+ var h='<header class="top"><button class="btn ghost small" data-act="home" aria-label="Zur Startseite. Dein Fortschritt bleibt gespeichert.">‹ Startseite</button>'+
+  '<div class="score">'+(S.mode==='retry'?'Wiederholung · ':'')+'Punkte<b>'+scoreOf()+'</b></div></header>'+
+  '<div class="bar" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+(S.pos+(r?1:0))+'"><i style="width:'+pct+'%"></i></div>'+
+  '<div class="crumb"><span class="lvl">Stufe '+(levelOf(qi)+1)+' · '+esc(lv.n)+'</span><span class="cnt">Frage '+(S.pos+1)+' von '+total+'</span></div>';
+ h+='<article class="card"><p class="kind">'+esc(kind)+'</p><h2 class="q">'+prompt(q.q)+'</h2>';
+ if(q.t==='mc')h+=mcHTML(q,qi,r);
+ else if(q.t==='type')h+=typeHTML(q,r);
+ else h+='<div id="orderw">'+orderHTML(q,qi,r)+'</div>';
+ if(r)h+=fbHTML(q,r)+'<div class="nextrow"><button class="btn primary" id="nextbtn" data-act="next">'+(S.pos===total-1?'Ergebnis ansehen':'Weiter')+'</button></div>';
+ h+='</article>';
+ return h;
+}
+
+function mcHTML(q,qi,r){
+ var perm=[];for(var i=0;i<q.o.length;i++)perm.push(i);
+ if(!q.tf)perm=shuffle(perm,qi*7919+13);
+ var h='<div class="opts'+(q.tf?' two':'')+'" role="group" aria-label="Antworten">';
+ perm.forEach(function(oi,n){
+  var cls='opt',ic='';
+  if(r){cls+=' done';if(oi===q.a){cls+=' ok';ic=ICON_OK;}else if(oi===r.gi){cls+=' bad';ic=ICON_BAD;}else cls+=' dim';}
+  h+='<button class="'+cls+'" data-act="opt" data-oi="'+oi+'"'+(r?' aria-disabled="true"':'')+'><span class="k">'+(n+1)+'</span><span class="t">'+esc(q.o[oi])+'</span>'+ic+'</button>';
+ });
+ return h+'</div>';
+}
+function typeHTML(q,r){
+ if(r)return '<div class="typef"><input class="'+(r.ok?'ok':'bad')+'" value="'+esc(r.g)+'" readonly aria-label="Deine Antwort"></div>';
+ return '<form class="typef" data-form="type"><label class="sr" for="ans">Deine Antwort</label><input id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="'+esc(q.ph)+'"><button class="btn primary" type="submit">Prüfen</button></form>';
+}
+function orderHTML(q,qi,r){
+ if(r){return '<div class="line '+(r.ok?'ok':'bad')+'"><span style="font-weight:800">'+esc(r.g)+'</span></div>';}
+ if(!OS||OS.qi!==qi){var idx=[];for(var i=0;i<q.tokens.length;i++)idx.push(i);var p=shuffle(idx,qi*104729+7);var same=p.every(function(v,k){return v===k;});if(same)p.push(p.shift());OS={qi:qi,placed:[],perm:p};}
+ var line=OS.placed.length?OS.placed.map(function(ti,k){return '<button class="chip" data-act="unplace" data-k="'+k+'" aria-label="Entfernen: '+esc(q.tokens[ti])+'">'+esc(q.tokens[ti])+'</button>';}).join(''):'<span class="hint">Tippe die Wörter unten an, um den Satz zu bauen.</span>';
+ var bank=OS.perm.filter(function(ti){return OS.placed.indexOf(ti)<0;}).map(function(ti){return '<button class="chip" data-act="place" data-ti="'+ti+'">'+esc(q.tokens[ti])+'</button>';}).join('');
+ var full=OS.placed.length===q.tokens.length;
+ return '<div class="line" aria-label="Dein Satz">'+line+'</div><div class="bank" aria-label="Wörter">'+bank+'</div>'+
+  '<div class="orderbar"><button class="btn primary" data-act="check" '+(full?'':'disabled')+'>Prüfen</button><button class="btn ghost" data-act="resetorder" '+(OS.placed.length?'':'disabled')+'>Zurücksetzen</button></div>';
+}
+function fbHTML(q,r){
+ var ok=r.ok;
+ var h='<div class="fb '+(ok?'ok':'bad')+'" id="fb" role="status" aria-live="polite"><h3>'+(ok?ICON_OK+'Richtig!':ICON_BAD+'Leider falsch.')+'</h3>';
+ if(!ok)h+='<p class="corr"><span>Richtige Antwort</span><b>'+esc(correctText(q))+'</b></p>';
+ h+='<p>'+esc(q.ex)+'</p>';
+ if(q.t==='order'&&q.sol.length>1&&!ok)h+='<p class="corr"><span>Weitere mögliche Sätze</span><b>'+q.sol.slice(1).map(esc).join('<br>')+'</b></p>';
+ if(q.trap)h+='<div class="trap"><b>Stolperfalle</b><p>'+esc(q.trap)+'</p></div>';
+ return h+'</div>';
+}
+
+function resultHTML(){
+ var total=S.queue.length,sc=scoreOf(),pct=Math.round(sc/total*100);
+ var master=S.mode==='full'&&pct>=94;
+ var title,msg;
+ if(S.mode==='retry'){title=sc===total?'Alle Fehler korrigiert!':'Wiederholung beendet';msg='Du hast '+sc+' von '+total+' früheren Fehlern jetzt richtig beantwortet.';}
+ else if(master){title='Ausgezeichnet!';msg='Du beherrschst das Perfekt meisterhaft. Ohne Fleiß kein Preis, und diesen Preis hast du dir verdient.';}
+ else if(pct>=80){title='Sehr gut!';msg='Fast meisterhaft. Schau dir die Stolperfallen noch einmal an, dann kommst du auf 94 Prozent.';}
+ else if(pct>=60){title='Gut gemacht!';msg='Die Grundlagen sitzen. Übe besonders die Stufen, in denen du Fehler gemacht hast.';}
+ else{title='Weiter üben!';msg='Wiederhole die Regeln und versuche es noch einmal. Jeder Fehler bringt dich weiter.';}
+ var C=2*Math.PI*54;
+ var h='<section class="res card">';
+ if(master)h+='<div class="cele">'+bee('r')+'</div><span class="badge">PERFEKT-MEISTER</span>';
+ h+='<div class="ring"><svg class="r" viewBox="0 0 120 120" aria-hidden="true"><circle class="tr" cx="60" cy="60" r="54" fill="none" stroke-width="11"/><circle class="pg" id="pg" cx="60" cy="60" r="54" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+C.toFixed(1)+'" data-c="'+C.toFixed(1)+'" data-p="'+pct+'"/></svg>'+
+  '<div class="num"><span>'+pct+' %</span><small>'+sc+' von '+total+'</small></div></div>';
+ h+='<h2 class="rtitle">'+esc(title)+'</h2><p class="rmsg">'+esc(msg)+'</p>';
+ if(S.mode==='full'){
+  h+='<div class="lv">';
+  LEVELS.forEach(function(l,k){var n=0,ok=0;S.queue.forEach(function(i){if(levelOf(i)===k){n++;if(S.res[i]&&S.res[i].ok)ok++;}});if(!n)return;
+   h+='<div><span>Stufe '+(k+1)+' · '+esc(l.n)+'</span><span>'+ok+' / '+n+'</span><i><u style="width:'+Math.round(ok/n*100)+'%"></u></i></div>';});
+  h+='</div>';
+ }
+ var wrong=S.queue.filter(function(i){return !(S.res[i]&&S.res[i].ok);});
+ if(wrong.length){
+  h+='<div class="errs"><h3>Das solltest du wiederholen</h3>'+wrong.map(function(i){var q=Q[i];return '<div class="err"><small>Frage '+(i+1)+'</small><p>'+prompt(q.q)+'</p><p>Richtig: <b>'+esc(correctText(q))+'</b></p></div>';}).join('')+'</div>';
+ }
+ h+='<div class="actions">'+(wrong.length?'<button class="btn primary" data-act="retry">Fehler wiederholen ('+wrong.length+')</button>':'')+
+  '<button class="btn '+(wrong.length?'':'primary')+'" data-act="restart">Neu starten</button><button class="btn ghost" data-act="home">Startseite</button></div></section>';
+ return h;
+}
+
+/* ---------- Rendern ---------- */
+function render(){
+ if(view==='start')app.innerHTML=startHTML();
+ else if(view==='quiz')app.innerHTML=quizHTML();
+ else app.innerHTML=resultHTML();
+ if(view==='quiz'){
+  var qi=S.queue[S.pos],q=Q[qi],r=S.res[qi];
+  if(r&&justAnswered){var nb=document.getElementById('nextbtn');if(nb)nb.focus({preventScroll:true});var fb=document.getElementById('fb');if(fb)fb.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'});}
+  else if(!r&&q.t==='type'&&fine){var inp=document.getElementById('ans');if(inp)inp.focus();}
+  justAnswered=false;
+ }
+ if(view==='result'){
+  var pg=document.getElementById('pg');
+  if(pg){var c=parseFloat(pg.getAttribute('data-c')),p=parseFloat(pg.getAttribute('data-p'));requestAnimationFrame(function(){requestAnimationFrame(function(){pg.setAttribute('stroke-dashoffset',(c*(1-p/100)).toFixed(1));});});}
+  if(S.mode==='full'&&Math.round(scoreOf()/S.queue.length*100)>=94)confetti();
+ }
+ window.scrollTo(0,0);
+}
+function rerenderOrder(){var q=Q[S.queue[S.pos]];var w=document.getElementById('orderw');if(w)w.innerHTML=orderHTML(q,S.queue[S.pos],null);}
+
+/* ---------- Aktionen ---------- */
+function answer(ok,given,gi){
+ var qi=S.queue[S.pos];
+ if(S.res[qi])return;
+ S.res[qi]={ok:ok,g:given,gi:typeof gi==='number'?gi:-1};
+ save();justAnswered=true;
+ var y=window.scrollY;render();window.scrollTo(0,y);
+}
+function next(){
+ if(S.pos<S.queue.length-1){S.pos++;save();render();}
+ else{S.done=true;save();view='result';render();}
+}
+function go(v){view=v;confirmNew=false;stopFx();render();}
+
+app.addEventListener('click',function(e){
+ var el=e.target.closest('[data-act]');if(!el||el.disabled)return;
+ var a=el.getAttribute('data-act');
+ if(a==='newrun'){
+  var hasProgress=S&&(answeredCount()>0);
+  if(hasProgress&&!confirmNew){confirmNew=true;render();return;}
+  S=newRun('full',allIdx());save();OS=null;confirmNew=false;view='quiz';render();
+ }
+ else if(a==='resume'){view='quiz';render();}
+ else if(a==='result'){view='result';render();}
+ else if(a==='home'){go('start');}
+ else if(a==='next'){next();}
+ else if(a==='opt'){var q=Q[S.queue[S.pos]];var oi=parseInt(el.getAttribute('data-oi'),10);if(S.res[S.queue[S.pos]])return;answer(oi===q.a,q.o[oi],oi);}
+ else if(a==='place'){OS.placed.push(parseInt(el.getAttribute('data-ti'),10));rerenderOrder();}
+ else if(a==='unplace'){OS.placed.splice(parseInt(el.getAttribute('data-k'),10),1);rerenderOrder();}
+ else if(a==='resetorder'){OS.placed=[];rerenderOrder();}
+ else if(a==='check'){var q2=Q[S.queue[S.pos]];var s=OS.placed.map(function(i){return q2.tokens[i];}).join(' ');var ok=q2.sol.some(function(x){return x.toLowerCase()===s.toLowerCase();});answer(ok,s);}
+ else if(a==='retry'){var wrong=S.queue.filter(function(i){return !(S.res[i]&&S.res[i].ok);});S=newRun('retry',wrong);save();OS=null;view='quiz';stopFx();render();}
+ else if(a==='restart'){S=newRun('full',allIdx());save();OS=null;view='quiz';stopFx();render();}
+});
+app.addEventListener('submit',function(e){
+ if(e.target.getAttribute('data-form')!=='type')return;
+ e.preventDefault();
+ var inp=document.getElementById('ans'),v=inp?inp.value:'';
+ if(!norm(v)){if(inp)inp.focus();return;}
+ var q=Q[S.queue[S.pos]];
+ var ok=q.ans.some(function(x){return norm(x)===norm(v);});
+ answer(ok,v.trim());
+});
+document.addEventListener('keydown',function(e){
+ if(view!=='quiz'||!S||e.ctrlKey||e.metaKey||e.altKey)return;
+ var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+ var qi=S.queue[S.pos],q=Q[qi];
+ if(q.t!=='mc'||S.res[qi])return;
+ var n=parseInt(e.key,10);if(!n||n<1||n>q.o.length)return;
+ var btns=app.querySelectorAll('.opt');if(btns[n-1])btns[n-1].click();
+});
+
+/* ---------- Konfetti ---------- */
+function stopFx(){fxToken++;var c=document.getElementById('fx');if(c){var x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);}}
+function confetti(){
+ if(reduced)return;
+ var c=document.getElementById('fx'),x=c.getContext('2d'),tok=++fxToken;
+ c.width=window.innerWidth;c.height=window.innerHeight;
+ var cols=['#F2B83B','#FFD66B','#FFFFFF','#43D8A0','#7FB2FF','#FF8F8F'],P=[];
+ for(var i=0;i<170;i++)P.push({x:Math.random()*c.width,y:-30-Math.random()*c.height*.7,w:6+Math.random()*8,h:9+Math.random()*10,vy:2.2+Math.random()*3.6,vx:-1.6+Math.random()*3.2,r:Math.random()*6.28,vr:-.22+Math.random()*.44,c:cols[Math.floor(Math.random()*cols.length)]});
+ var t0=performance.now();
+ function frame(t){
+  if(tok!==fxToken)return;
+  x.clearRect(0,0,c.width,c.height);
+  P.forEach(function(p){p.x+=p.vx+Math.sin((t+p.y)/400)*.6;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();});
+  if(t-t0<7500)requestAnimationFrame(frame);else x.clearRect(0,0,c.width,c.height);
+ }
+ requestAnimationFrame(frame);
+}
+
+render();
+})();
+</script>
+</body>
+</html>
